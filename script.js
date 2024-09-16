@@ -2,7 +2,7 @@ document.getElementById("submit-btn").addEventListener("click", function () {
   sendToChatGPT();
 });
 
-// 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
+// sk-KWPbM1hl1XtQStz2zpVR_2NfTgwzgyJewJe_oL9JpHT3BlbkFJJdefqidy0XBjDi0DXCUNnOR8fcVzwJVtXlB8aw4w4A
 
 function sendToChatGPT() {
   let value = document.getElementById("word-input").value;
@@ -14,7 +14,7 @@ function sendToChatGPT() {
   };
 
   let headers = {
-    Authorization: "Bearer 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",
+    Authorization: "Bearer sk-KWPbM1hl1XtQStz2zpVR_2NfTgwzgyJewJe_oL9JpHT3BlbkFJJdefqidy0XBjDi0DXCUNnOR8fcVzwJVtXlB8aw4w4A",
   };
 
   axios
