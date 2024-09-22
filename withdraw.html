@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سحب الرصيد</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,500..900;1,500..900&display=swap">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    body {
+      background-color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      direction: rtl;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 0px;
+    }
+
+    h3 {
+        text-align: right;
+        margin-bottom: 15px;
+        color: #000;
+        font-weight: 700;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        text-align: right;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+        color: #000;
+        font-weight: 700;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 15px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        border-radius: 15px;
+        outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        border-color: #007BFF;
+    }
+
+    .balance-info {
+        background-color: #ADB9F5;
+        padding: 10px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .balance-info span {
+        font-size: 18px;
+        font-weight: bold;
+        color: #fff;
+    }
+    
+    .balance-info .stored-balance img {
+      margin-right: 5px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .conversion-rate {
+        margin-top: 5px;
+        font-size: 12px;
+        color: #888;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 10px;
+        background: linear-gradient(to right, #0E43F1, #0E43F1);
+        border: none;
+        border-radius: 15px;
+        color: #FFF;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+    }
+
+    .error {
+        color: red;
+        font-size: 14px;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .stored-balance {
+        font-weight: 700;
+        font-size: 20px;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .stored-balance span {
+        margin-right: 5px;
+    }
+
+    .stored-balance span:last-child {
+        font-size: 14px;
+        color: #637BDD;
+    }
+
+    .exchange-rate {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 12px;
+        color: #637BDD;
+    }
+
+    /* Popup Styles */
+    .popup {
+        display: none; /* مخفي بشكل افتراضي */
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6); /* خلفية داكنة */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .popup-content {
+        background-color: #fff;
+        border-radius: 25px;
+        padding: 20px;
+        text-align: center;
+        width: 80%;
+        max-width: 400px;
+        position: relative;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        color: #000;
+    }
+
+    .popup h2 {
+        margin: 0;
+        font-size: 20px;
+        color: #000;
+    }
+
+    .popup p {
+        margin: 15px 0;
+        font-size: 16px;
+        color: #000;
+    }
+
+    .popup button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 15px;
+        background: linear-gradient(to right, #0E43F1, #0E43F1, #0E43F1);
+        color: #fff;
+        font-size: 16px;
+        margin-top: 15px;
+    }
+
+    .country-code-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 10px; /* مسافة بين العناصر */
+    }
+
+    .country-code-container select {
+        width: auto;
+        padding: 10px;
+        flex-shrink: 0;
+    }
+
+    .country-code-container input {
+        flex-grow: 1;
+    }
+    
+    .amount-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .withdraw-all-btn {
+      padding: 10px;
+      background: #637BDD;
+      border: none;
+      border-radius: 15px;
+      color: #FFF;
+      font-size: 14px;
+      outline: none;
+    }
+    
+   
+  </style>
+</head>
+<body>
+    <div class="popup" id="errorPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closeErrorPopup()">×</span>
+            <h2>تنبيه</h2>
+            <p id="errorMessage">يرجى تعبئة جميع الحقول بشكل صحيح.</p>
+            <button onclick="closeErrorPopup()">موافق</button>
+        </div>
+    </div>
+
+    <div class="popup" id="successPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closeSuccessPopup()">×</span>
+            <h2>نجاح</h2>
+            <p id="successMessage">تم إرسال الطلب بنجاح!</p>
+            <button onclick="closeSuccessPopup()">موافق</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3>البيانات الشخصية</h3>
+        <div class="form-group">
+            <label for="beneficiaryName">اسم المستفيد *</label>
+            <input type="text" id="beneficiaryName" placeholder="أدخل اسم المستفيد" required>
+        </div>
+        <div class="form-group">
+            <label for="bankName">اسم البنك *</label>
+            <input type="text" id="bankName" placeholder="أدخل اسم البنك" required>
+        </div>
+        <div class="form-group country-code-container">
+            <label for="phoneNumber">رقم الهاتف *</label>
+            <select id="countryCode" required>
+                <option value="+90" selected>🇹🇷 (+90)</option>
+                <option value="+20">🇪🇬 (+20)</option>
+                <option value="+92">🇵🇰 (+92)</option>
+            </select>
+            <input type="tel" id="phoneNumber" placeholder="أدخل رقم الهاتف" required>
+        </div>
+        <div class="form-group">
+            <label for="iban">رقم الحساب المصرفي الدولي (IBAN) *</label>
+            <input type="text" id="iban" placeholder="IBAN0000000000000000000000" required>
+        </div>
+
+        <div class="balance-info">
+            <div class="stored-balance">
+                <img src="https://img.icons8.com/external-icongeek26-flat-icongeek26/999/external-diamond-diamonds-icongeek26-flat-icongeek26-5.png" alt="Gemstone">
+                <span id="storedBalance">0</span> <span>ماسة</span>
+            </div>
+            <div class="exchange-rate" id="exchangeRate">0 ماسة = 0$</div>
+        </div>
+
+        <div class="form-group">
+            <label for="withdrawAmount">مبلغ نقدي *</label>
+            <div class="amount-container">
+                <input type="text" id="withdrawAmount" placeholder="أدخل مبلغ السحب" required>
+                <button type="button" class="withdraw-all-btn" onclick="setMaxAmount()"> الكل</button>
+            </div>
+        </div>
+        
+        <button class="submit-btn" onclick="submitForm()">تأكيد</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBalance();
+            setInterval(() => {
+                updateBalance();
+            }, 1000);
+        });
+
+        function getPoints() {
+            return parseFloat(localStorage.getItem('currency2')) || 0;
+        }
+
+        function setPoints(points) {
+            localStorage.setItem('currency2', points);
+            updateDisplay(points);
+        }
+
+        function formatNumber(number) {
+            return number.toLocaleString(); // استخدام toLocaleString لتنسيق الأرقام بفواصل الألف
+        }
+
+        function updateDisplay(points) {
+            const pointsInDollars = points / pointsPerDollar;
+            document.getElementById('storedBalance').innerText = `${formatNumber(points.toFixed(0))}`;
+            document.getElementById('exchangeRate').innerText = points < 1000 ?
+              `${formatNumber(points.toFixed(0))} ماسة = ${(pointsInDollars * 100).toFixed(0)} سنت` :
+              `${formatNumber(points.toFixed(0))} ماسة = ${pointsInDollars.toFixed(0)}$`;
+        }
+
+        function updateBalance() {
+            let balance = getPoints();
+            updateDisplay(balance);
+        }
+
+        function submitForm() {
+            const beneficiaryName = document.getElementById('beneficiaryName').value;
+            const bankName = document.getElementById('bankName').value;
+            const iban = document.getElementById('iban').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const countryCode = document.getElementById('countryCode').value;
+            const withdrawAmount = parseFloat(document.getElementById('withdrawAmount').value.replace(/,/g, '')); // إزالة الفواصل من القيمة المدخلة
+            
+            if (!beneficiaryName || !bankName || !iban || !phoneNumber || isNaN(withdrawAmount)) {
+                showErrorPopup('يرجى تعبئة جميع الحقول بشكل صحيح.');
+                return;
+            }
+            
+            if (withdrawAmount < 10) {
+                showErrorPopup('الحد الأدنى للسحب هو 10 دولار.');
+                return;
+            }
+            
+            if (withdrawAmount > 100) {
+                showErrorPopup('الحد الأقصى للسحب هو 100 دولار.');
+                return;
+            }
+            
+            const equivalentPoints = withdrawAmount * pointsPerDollar;
+            
+            if (equivalentPoints > getPoints()) {
+                showErrorPopup('الرصيد غير كافٍ لإتمام عملية السحب.');
+                return;
+            }
+            
+            const botToken = '7112334795:AAGYoFLGAi_ktRsWtAJLcXUaf6PGNv8-flY';
+            const chatId = '1199298908';
+            const message = `
+                طلب سحب جديد:
+                الاسم: ${beneficiaryName}
+                البنك: ${bankName}
+                رقم الحساب: ${iban}
+                رقم الهاتف: ${countryCode} ${phoneNumber}
+                المبلغ: ${withdrawAmount}$
+                المسات المخصومة: ${equivalentPoints}
+            `;
+            
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: message,
+                }),
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.ok) {
+                  showSuccessPopup('تم إرسال طلب السحب بنجاح!');
+                  setPoints(getPoints() - equivalentPoints);
+                  document.getElementById('withdrawAmount').value = '';
+                } else {
+                  showErrorPopup('حدث خطأ أثناء إرسال طلب السحب. الرجاء المحاولة لاحقًا.');
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                showErrorPopup('حدث خطأ أثناء إرسال طلب السحب. الرجاء المحاولة لاحقًا.');
+              });
+        }
+        
+        function showErrorPopup(message) {
+          document.getElementById('errorMessage').innerText = message;
+          document.getElementById('errorPopup').style.display = 'flex';
+        }
+        
+        function closeErrorPopup() {
+          document.getElementById('errorPopup').style.display = 'none';
+        }
+        
+        function showSuccessPopup(message) {
+          document.getElementById('successMessage').innerText = message;
+          document.getElementById('successPopup').style.display = 'flex';
+        }
+        
+        function closeSuccessPopup() {
+          document.getElementById('successPopup').style.display = 'none';
+        }
+        
+        function setMaxAmount() {
+          const maxAmount = getPoints() / pointsPerDollar;
+          document.getElementById('withdrawAmount').value = formatNumber(maxAmount.toFixed(2)); // تنسيق الأرقام بالأرقام الأجنبية
+        }
+        
+        const pointsPerDollar = 1000; // كل 1000 ماسة تساوي 1 دولار
+    </script>
+</body>
+</html>
