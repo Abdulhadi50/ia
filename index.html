@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Click and collect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,500..900;1,500..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(45deg, #202020, #202020, #202020);
+            user-select: none;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            margin-top: 130px
+        }
+        .balance, .storage, .info {
+            margin: 10px 0;
+            font-size: 25px;
+            color: #fff;
+        }
+        .balance img, .storage img {
+            width: 35px;
+            vertical-align: middle;
+            margin-top: -8px;
+        }
+        .button {
+          font-family: 'Rubik', sans-serif;
+            background: linear-gradient(to right, #F9A028, #F9A028);
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #000;
+            border-radius: 15px;
+            transition: background-color 0.3s;
+            margin: 50px;
+        }
+        .button:disabled {
+            background-color: #fff;
+        }
+        .info {
+            font-size: 15px;
+            color: #777777;
+            margin-top: -50px;
+        }
+        .add-point {
+            width: 250px;
+            height: 250px;
+            transition: transform 1000.5s ease-out;
+            border-radius: 0%;
+            margin-block: 50px;
+        }
+        .add-point:hover {
+            transform: scale(1.2);
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-200px); }
+        }
+        .plus-one {
+            position: absolute;
+            color: #F9A028;
+            font-size: 40px;
+            animation: fadeOut 0.4s forwards;
+            pointer-events: none;
+        }
+        
+        
+    </style>
+</head>
+<body>
+  
+  <div style="position: absolute; top: 33px; left: 20px;" onclick="redirectToSection('http://action_notifications')">
+    <img src="https://img.icons8.com/fluency-systems-regular/500/4E595F/appointment-reminders--v1.png" alt="" width="30" height="30">
+  </div>
+  
+  <div style="position: absolute; top: 29px; left: 70px;" onclick="redirectToSection('balance.html')">
+    <img src="https://img.icons8.com/glassmorphism/999/bank-cards.png" alt="" width="35" height="35">
+  </div>
+  
+  <div style="position: absolute; top: 30px; left: 330px;" onclick="redirectToSection('go:file')">
+    <img src="https://img.icons8.com/external-android-line-2px-amoghdesign/600/4E595F/external-list-multimedia-line-24px-android-line-2px-amoghdesign-3.png" alt="" width="35" height="35">
+  </div>
+
+<div class="container">
+    <div class="storage">
+        <span id="in-storage">0.00000</span> <img src="https://img.icons8.com/color-pixels/999/star.png"/>
+    </div>
+    <div>
+        <button class="button" id="collect-button" onclick="collectRBT()" disabled>اجمع</button>
+    </div>
+    <div class="info">
+        <p>للجمع 0.05</p>
+    </div>
+    <div class="balance">
+        <span id="balance">0.00</span> <img src="https://img.icons8.com/color-pixels/999/star.png" />
+    </div>
+</div>
+
+<div>
+    <img id="add-point-image" class="add-point" src="https://img.icons8.com/color-pixels/999/star.png" alt="اضغط هنا" title="اضغط لإضافة نقطة واحدة"/>
+</div>
+
+
+<script type="text/javascript">
+    atOptions = {
+      'key': '542e4ab9d29dabe581dd01d32c186d01',
+      'format': 'iframe',
+      'height': 50,
+      'width': 320,
+      'params': {}
+    };
+  </script>
+  <script type="text/javascript" src="//www.topcreativeformat.com/542e4ab9d29dabe581dd01d32c186d01/invoke.js"></script>
+
+<script>
+    const MIN_STORAGE_TO_COLLECT = 0.0500;
+    const MAX_CLICKS_PER_SECOND = 10;
+    let lastClickTime = 0;
+    let clickCount = 0;
+
+    let storage = parseFloat(localStorage.getItem('storage')) || 0.00000;
+    let balance = parseFloat(localStorage.getItem('currency2')) || 0.00000;
+
+    document.getElementById('balance').innerText = ' ' + balance.toFixed(2);
+    document.getElementById('in-storage').innerText = storage.toFixed(5);
+
+    function collectRBT() {
+        if (storage >= MIN_STORAGE_TO_COLLECT) {
+            balance += storage;
+            storage = 0;
+            localStorage.setItem('currency2', balance.toFixed(2));
+            localStorage.setItem('storage', storage.toFixed(5));
+            document.getElementById('balance').innerText = ' ' + balance.toFixed(2);
+            document.getElementById('in-storage').innerText = storage.toFixed(5);
+            document.getElementById('collect-button').disabled = true;
+        }
+    }
+
+    function addPoint(x, y) {
+        const now = Date.now();
+        if (now - lastClickTime > 2000) {
+            clickCount = 0;
+            lastClickTime = now;
+        }
+
+        if (clickCount >= MAX_CLICKS_PER_SECOND) {
+            return;
+        }
+
+        clickCount++;
+        storage += 0.00001;
+        localStorage.setItem('storage', storage.toFixed(5));
+        document.getElementById('in-storage').innerText = storage.toFixed(5);
+        if (storage >= MIN_STORAGE_TO_COLLECT) {
+            document.getElementById('collect-button').disabled = false;
+        }
+
+        const plusOne = document.createElement('div');
+        plusOne.innerText = '+1';
+        plusOne.classList.add('plus-one');
+        plusOne.style.left = `${x}px`;
+        plusOne.style.top = `${y}px`;
+        document.body.appendChild(plusOne);
+        plusOne.addEventListener('animationend', () => {
+            plusOne.remove();
+        });
+    }
+
+    document.getElementById('add-point-image').addEventListener('click', function(event) {
+        const rect = this.getBoundingClientRect();
+        const x = event.clientX;
+        const y = event.clientY;
+        addPoint(x, y);
+    });
+
+    window.onload = function() {
+        document.getElementById('balance').innerText = ' ' + balance.toFixed(2);
+        document.getElementById('in-storage').innerText = storage.toFixed(5);
+        if (storage >= MIN_STORAGE_TO_COLLECT) {
+            document.getElementById('collect-button').disabled = false;
+        }
+    }
+    
+    function redirectToSection(section) {
+      window.location.href = section;
+    }
+    
+</script>
+
+</body>
+</html>
