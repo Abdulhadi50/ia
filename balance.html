@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رصيد وسحب</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,500..900;1,500..900&display=swap');
+
+        * {
+            font-family: 'Rubik', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            direction: rtl;
+        }
+
+        body {
+            background-color: #202020;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        #balanceForm {
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        #balanceDisplay {
+            background-color: #777;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            color: #fff
+        }
+
+        #balanceDisplay img {
+            margin-left: 5px;
+        }
+
+        #balanceDisplay span {
+            font-weight: 500;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        #usdEquivalent {
+            background-color: #777;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+
+        #withdrawButton {
+            background: linear-gradient(to right, #F9A028, #F9A028);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            border: none;
+            font-size: 14px;
+            width: 100px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .container p {
+            color: #fff;
+            font-size: 10px;
+            margin-bottom: 10px;
+        }
+
+        .icon-balance {
+            width: 25px;
+            height: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div id="balanceForm">
+        <div id="balanceDisplay">
+            <div>
+                <img src="https://img.icons8.com/color-pixels/999/star.png" alt="رصيد" class="icon-balance">
+                <span id="currentBalance">0</span>
+            </div>
+            <div>My stars</div>
+        </div>
+        <div id="usdEquivalent">
+            $<span id="usdValue">0.00</span>
+            ≈
+        </div>
+        <button id="withdrawButton" onclick="goTowithdraw()">سحب</button>
+        <script type="text/javascript">
+          atOptions = {
+            'key': 'f7cd9f1f366fcc3ef38725d42f52f7b6',
+            'format': 'iframe',
+            'height': 250,
+            'width': 300,
+            'params': {}
+          };
+        </script>
+        <script type="text/javascript" src="//outrightsham.com/f7cd9f1f366fcc3ef38725d42f52f7b6/invoke.js"></script>
+        <div class="container">
+            <p>حالياً، يمكنك السحب يومياً وبدون حدود لعدد طلبات السحب. الحد الأقصى لمبلغ السحب الواحد هو (10) دولار أمريكي، وذلك حسب القيود المفروضة من قبل وسطاء السحب المختلفة وحساب السحب ذاته.</p>
+            <p>سيتم مراجعة طلبات السحب عبر الإنترنت خلال 48 ساعة، وسيتم تحويل الأموال إلى حسابك البنكي خلال 7 أيام.</p>
+            <p>تأكد من أن معلومات السحب التي تقدمها لنا دقيقة وصحيحة وكاملة. أي تكاليف أو خسائر أو نزاعات أو مشكلات أخرى ناتجة عن معلومات السحب غير الدقيقة أو غير الكاملة ستكون مسؤوليتك أنت.</p>
+            <p>سيتم تحديث سعر صرف العملات/سحب العملات بشكل فوري بناءً على تقلبات اسواق الصرف.</p>
+        </div>
+    </div>
+
+    <script>
+        const balanceKey = 'currency2';
+        const pointsToUSD = 1000; // 1 دولار = 1000 نقطة
+
+        function formatNumberWithCommas(number) {
+            return number.toLocaleString('en-US');
+        }
+
+        function updateBalanceDisplay() {
+            const balance = parseFloat(localStorage.getItem(balanceKey)) || 0;
+            const formattedBalance = formatNumberWithCommas(balance);
+            const usdValue = (balance / pointsToUSD).toFixed(2);
+
+            document.getElementById('currentBalance').textContent = formattedBalance;
+            document.getElementById('usdValue').textContent = usdValue;
+        }
+
+        function goTowithdraw() {
+            window.location.href = "withdraw";
+        }
+
+        updateBalanceDisplay();
+        setInterval(updateBalanceDisplay, 1000);
+    </script>
+</body>
+</html>
