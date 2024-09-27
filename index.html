@@ -193,93 +193,145 @@
     </div>
 </div>
 
-<audio id="click-sound" src="123123123.mp3"></audio>
+<head>
+    <!-- إضافة Font Awesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
 
-<script>
-  const MIN_STORAGE_TO_COLLECT = 0.005;
-  const MAX_CLICKS_PER_SECOND = 50;
-  let lastClickTime = 0;
-  let clickCount = 0;
+<body>
+    <audio id="click-sound" src="path-to-your-sound-file.mp3"></audio>
 
-  let storage = parseFloat(localStorage.getItem('storage')) || 0.000000;
-  let balance = parseFloat(localStorage.getItem('currency2')) || 0.000000;
+    <!-- زر كتم الصوت -->
+    <button id="mute-button" onclick="toggleMute()">
+        <i id="mute-icon" class="fas fa-volume-up"></i>
+    </button>
 
-  document.getElementById('balance').innerText = formatNumber(balance);
-  document.getElementById('in-storage').innerText = formatNumber(storage, 6);
+    <script>
+        const MIN_STORAGE_TO_COLLECT = 0.005;
+        const MAX_CLICKS_PER_SECOND = 50;
+        let lastClickTime = 0;
+        let clickCount = 0;
+        let isMuted = false; // حالة كتم الصوت
 
-  function formatNumber(num, decimals = 6) {
-    return num.toLocaleString('tr-TR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-  }
+        let storage = parseFloat(localStorage.getItem('storage')) || 0.000000;
+        let balance = parseFloat(localStorage.getItem('currency2')) || 0.000000;
 
-  function collectRBT() {
-    if (storage >= MIN_STORAGE_TO_COLLECT) {
-      const collectedAmount = storage;
-      balance += storage;
-      storage = 0;
-      localStorage.setItem('currency2', balance.toFixed(6));
-      localStorage.setItem('storage', storage.toFixed(6));
-      document.getElementById('balance').innerText = formatNumber(balance);
-      document.getElementById('in-storage').innerText = formatNumber(storage, 6);
-      document.getElementById('collect-button').disabled = true;
+        document.getElementById('balance').innerText = formatNumber(balance);
+        document.getElementById('in-storage').innerText = formatNumber(storage, 6);
 
-      // Popup'u göster
-      showPopup(collectedAmount);
-    }
-  }
+        function formatNumber(num, decimals = 6) {
+            return num.toLocaleString('tr-TR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        }
 
-  function showPopup(collectedAmount) {
-    document.getElementById('popup-message').innerText = `Toplamda ${collectedAmount.toFixed(6)} yıldız topladınız!`;
-    document.getElementById('popup').style.display = 'flex';
-  }
+        function collectRBT() {
+            if (storage >= MIN_STORAGE_TO_COLLECT) {
+                const collectedAmount = storage;
+                balance += storage;
+                storage = 0;
+                localStorage.setItem('currency2', balance.toFixed(6));
+                localStorage.setItem('storage', storage.toFixed(6));
+                document.getElementById('balance').innerText = formatNumber(balance);
+                document.getElementById('in-storage').innerText = formatNumber(storage, 6);
+                document.getElementById('collect-button').disabled = true;
 
-  function closePopup() {
-    document.getElementById('popup').style.display = 'none';
-  }
+                // Popup'u göster
+                showPopup(collectedAmount);
+            }
+        }
 
-  function addPoint(x, y) {
-    const now = Date.now();
-    if (now - lastClickTime > 1000) {
-      clickCount = 0;
-      lastClickTime = now;
-    }
+        function showPopup(collectedAmount) {
+            document.getElementById('popup-message').innerText = `Toplamda ${collectedAmount.toFixed(6)} yıldız topladınız!`;
+            document.getElementById('popup').style.display = 'flex';
+        }
 
-    if (clickCount >= MAX_CLICKS_PER_SECOND) {
-      return;
-    }
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
 
-    clickCount++;
-    storage += 0.000001;
-    localStorage.setItem('storage', storage.toFixed(6));
-    document.getElementById('in-storage').innerText = formatNumber(storage, 6);
-    if (storage >= MIN_STORAGE_TO_COLLECT) {
-      document.getElementById('collect-button').disabled = false;
-    }
+        function addPoint(x, y) {
+            const now = Date.now();
+            if (now - lastClickTime > 1000) {
+                clickCount = 0;
+                lastClickTime = now;
+            }
 
-    // Clone audio element to allow multiple sounds to play at once
-    const sound = document.getElementById('click-sound').cloneNode();
-    sound.play();
+            if (clickCount >= MAX_CLICKS_PER_SECOND) {
+                return;
+            }
 
-    const plusOne = document.createElement('div');
-    plusOne.innerText = '+1';
-    plusOne.classList.add('plus-one');
-    document.body.appendChild(plusOne);
+            clickCount++;
+            storage += 0.000001;
+            localStorage.setItem('storage', storage.toFixed(6));
+            document.getElementById('in-storage').innerText = formatNumber(storage, 6);
+            if (storage >= MIN_STORAGE_TO_COLLECT) {
+                document.getElementById('collect-button').disabled = false;
+            }
 
-    plusOne.style.left = `${x}px`;
-    plusOne.style.top = `${y}px`;
+            // تشغيل الصوت فقط إذا لم يكن مكتومًا
+            if (!isMuted) {
+                const sound = document.getElementById('click-sound').cloneNode();
+                sound.play();
+            }
 
-    setTimeout(() => {
-      plusOne.remove();
-    }, 800);
-  }
+            const plusOne = document.createElement('div');
+            plusOne.innerText = '+1';
+            plusOne.classList.add('plus-one');
+            document.body.appendChild(plusOne);
 
-  document.getElementById('add-point-image').addEventListener('click', function(event) {
-    const x = event.clientX;
-    const y = event.clientY;
-    addPoint(x, y);
-  });
+            plusOne.style.left = `${x}px`;
+            plusOne.style.top = `${y}px`;
 
-  // Prevent default drag behavior on images
-  document.querySelectorAll('img').forEach((img) => {
-    img.ondragstart = () => false;
-  });
-</script>
+            setTimeout(() => {
+                plusOne.remove();
+            }, 800);
+        }
+
+        document.getElementById('add-point-image').addEventListener('click', function (event) {
+            const x = event.clientX;
+            const y = event.clientY;
+            addPoint(x, y);
+        });
+
+        // Prevent default drag behavior on images
+        document.querySelectorAll('img').forEach((img) => {
+            img.ondragstart = () => false;
+        });
+
+        // Function to toggle mute
+        function toggleMute() {
+            isMuted = !isMuted; // تغيير حالة كتم الصوت
+            const icon = document.getElementById('mute-icon');
+            if (isMuted) {
+                icon.classList.remove('fa-volume-up');
+                icon.classList.add('fa-volume-mute');
+            } else {
+                icon.classList.remove('fa-volume-mute');
+                icon.classList.add('fa-volume-up');
+            }
+        }
+    </script>
+
+    <style>
+        /* تنسيق زر كتم الصوت */
+        #mute-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 25%;
+            margin-top: 150px;
+        }
+
+        #mute-icon {
+            font-size: 15px;
+            color: #fff;
+        }
+
+        /* عند الضغط */
+        #mute-button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</body>
