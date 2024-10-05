@@ -1,283 +1,273 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tıkla ve Topla</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,500..900;1,500..900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mining App</title>
     <style>
         body {
-    font-family: 'Rubik', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-    background: url('55555.jpg') no-repeat center center fixed; /* استبدل your-image-url.jpg برابط الصورة */
-    background-size: cover; /* لضبط الصورة لتغطي الصفحة بالكامل */
-    user-select: none;
-}
-        .header-buttons {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 100px;
+        }
+
+        .balance, .stats, .start-mining, .conversion {
             margin-bottom: 20px;
         }
-        .header-button {
-            display: flex;
-            align-items: center;
-            background: linear-gradient(to right, #C97610, #FFF7C0);
-            padding: 5px 15px;
-            border-radius: 15px;
-            margin: 0 10px;
-            color: #000;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        .header-button1 {
-            display: flex;
-            align-items: center;
-            background: linear-gradient(to right, #D9D3FF, #DDCFF2, #EDE5F2, #D0D7EA, #C3E5EE, #BCEEEF, #C1E7F0);
-            padding: 5px 15px;
-            border-radius: 15px;
-            margin: 0 10px;
-            color: #000;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        .header-button img {
-            width: 30px;
-            margin-right: 5px;
-        }
-        .header-button1 img {
-            width: 30px;
-            margin-right: 5px;
-        }
-        .container {
-            text-align: center;
-            padding: 20px;
-            margin-top: 10px;
-        }
-        .balance, .storage, .info {
-            margin: 10px 0;
-            font-size: 25px;
-            color: #000;
-        }
-        .balance img, .storage img {
-            width: 35px;
-            vertical-align: middle;
-            margin-top: -8px;
-        }
-        
-        .button {
-    font-family: 'Rubik', sans-serif;
-    background: linear-gradient(to right, #D9D3FF, #DDCFF2, #EDE5F2, #D0D7EA, #C3E5EE, #BCEEEF, #C1E7F0);
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #000;
-    border: none;
-    border-radius: 15px;
-    margin: 50px;
-}
 
-        .button:disabled {
-            background-color: #fff;
-        }
-        .info {
-            font-size: 15px;
-            color: #777777;
-            margin-top: -50px;
-        }
-        .add-point {
-            width: 250px;
-            height: 250px;
-            transition: transform 1000.5s ease-out;
-            border-radius: 50%;
-            margin-block: 50px;
-        }
-        
-        
-        @keyframes fadeOut {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-200px); }
-        }
-        .plus-one {
-            position: absolute;
-            color: #F9A028;
-            font-size: 40px;
-            animation: fadeOut 0.8s forwards;
-            pointer-events: none;
-        }
-        img, a {
-            cursor: default;
+        .balance, .conversion {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #E0E0E0;
+            padding: 15px;
+            border-radius: 10px;
         }
 
-        /* Popup Styles */
-        .popup {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Background blur */
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        .balance h2, .conversion h2 {
+            margin: 0;
+            font-size: 16px;
+            color: #555;
         }
-        .popup-content {
-            background-color: #fff;
-            border-radius: 15px;
+
+        .balance .balance-details, .conversion .conversion-details {
+            text-align: right;
+        }
+
+        .balance .balance-details span, .conversion .conversion-details span {
+            display: block;
+            font-size: 16px;
+        }
+
+        .balance .balance-details .rate, .conversion .conversion-details .rate {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stats .stat {
+            flex: 1;
+            margin: 0 5px;
             padding: 20px;
+            border-radius: 20px;
+            color: #fff;
             text-align: center;
-            width: 80%;
-            max-width: 300px;
+        }
+
+        .stats .stat:first-child {
+            background-color: #1a1a2e;
+        }
+
+        .stats .stat:last-child {
+            background-color: #e9e9e9;
+        }
+
+        .start-mining {
+            text-align: center;
+        }
+
+        .start-mining button {
+            background-color: #00F7A4;
+            color: #fff;
+            padding: 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            width: 100px;
+            height: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
             position: relative;
         }
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            color: #000;
-        }
-        .popup h2 {
-            font-size: 18px;
-            color: #000;
-        }
-        .popup p {
-            font-size: 16px;
-            color: #000;
+
+        .conversion-form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
+        .conversion-form input {
+            width: 200px;
+            height: 40px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: border 0.3s, box-shadow 0.3s;
+            border-color: #00F7A4;
+            box-shadow: 0 2px 8px rgba(14, 241, 98, 0.2);
+            outline: none;
+            margin-left: 70px;
+        }
+
+        .conversion-form button {
+            background-color: #00F7A4;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            margin-left: 140px;
+        }
+        
+        .fan {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiTTUO_u9ry4rAQnDa3Aaoh2bCGrCwhUfCm0g0tv8pGnk5vXUUCdA2PDVOz3Zx_suhhSK5Z-7zBAqnsaXET4p6khPqipVN2i3UDK8ftRg8m7XTyAy9kHInQ5S7FPkvnkLJkO8dAjHEUatBNSYbHNtnky8pbJidFtvgAMsqb0psobywGprXBzeCxg8iJTHas/s1600/%D9%A2%D9%A0%D9%A2%D9%A4%D9%A0%D9%A6%D9%A0%D9%A9_%D9%A2%D9%A3%D9%A3%D9%A0%D9%A0%D9%A6.png') no-repeat center/contain;
+            animation: spin 1.0s linear infinite;
+            margin-left: 13px
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
     </style>
 </head>
 <body>
-
-<div class="header-buttons">
-    <a class="header-button" href="page1.html">
-        Cüzdan
-    </a>
-    <a class="header-button" href="Referral.html">
-        Airdrop
-    </a>
-    <a class="header-button1" href="page3.html">
-        Prime
-    </a>
-</div>
-
-<div class="container">
-    <div class="storage">
-        <span id="in-storage">0.000000</span> <img src="https://img.icons8.com/skeuomorphism/999/star.png"/>
+    <div class="container">
+        <div class="conversion">
+            <div>
+                <h2>Stored Balance</h2>
+                <div class="conversion-details">
+                   <h1 id="balance">₺0.00</h1>
+                </div>
+            </div>
+        </div>
+        <div class="conversion-form">
+            <h2>Convert OPE to USD</h2>
+            <input type="number" id="ope-input" placeholder="Enter OPE amount" oninput="calculateTRY()">
+            <p id="try-output"></p>
+            <button onclick="convertToTRY()">Convert</button>
+        </div>
+        <div class="balance">
+            <div>
+                <h2>Current Balance</h2>
+                <div class="balance-details">
+                    <span id="ope-balance">0.0000 OPE</span>
+                    <span class="rate">0.0020/min.</span>
+                </div>
+            </div>
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPY52M61Hpf80eoOxss7JtLM141kZyDlw_mThdPYGPVaH67O4muCyrEdzC5H_lFzS9mbRW_DACwPgyWmXbeKvdFMWo3PZPs-sr9Azm-7f6ZgMBkUqJDrXWUZNuF8R-NdpgWQ9vVz2pvv8sgomgsffDPXWjPJUuXBUeSWqOAEa84UK8XuP_PpssIQYY0y6_/s1280/1000145892.png" alt="Ope Logo" width="50">
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <h3>Speed</h3>
+                <p>30 Gh/s</p>
+            </div>
+            <div class="stat">
+              <div class="fan"></div>
+            </div>
+        </div>
+        <div class="start-mining">
+            <button onclick="startMining()">Start</button>
+        </div>
     </div>
-    <div>
-        <button class="button" id="collect-button" onclick="collectRBT()" disabled>Topla</button>
-    </div>
-    <div class="info">
-        <p>0.005 yıldız toplamak için</p>
-    </div>
-    <div class="balance">
-        <span id="balance">0.000000</span> <img src="https://img.icons8.com/skeuomorphism/999/star.png"/>
-    </div>
-</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let storedBalance = parseFloat(localStorage.getItem('currency2')) || 0;
+            document.getElementById('balance').innerText = '$' + storedBalance.toFixed(2);
 
-<div>
-    <img id="add-point-image" class="add-point" src="1000165660.png" alt="Tıkla ve Puan Ekle" title="Puan eklemek için tıklayın"/>
-</div>
+            let opeBalance = parseFloat(localStorage.getItem('opeBalance')) || 0;
+            document.getElementById('ope-balance').innerText = opeBalance.toFixed(4) + ' OPE';
 
-<!-- Popup Notification -->
-<div id="popup" class="popup">
-    <div class="popup-content">
-        <span class="close-btn" onclick="closePopup()">&times;</span>
-        <h2>Toplanan Yıldızlar</h2>
-        <p id="popup-message"></p>
-    </div>
-</div>
+            let miningStatus = localStorage.getItem('mining') === 'true';
+            if (miningStatus) {
+                startMining(true);
+            }
+        });
 
-<script>
-    const MIN_STORAGE_TO_COLLECT = 0.005;
-    const MAX_CLICKS_PER_SECOND = 50;
-    let lastClickTime = 0;
-    let clickCount = 0;
-    
-    let storage = parseFloat(localStorage.getItem('storage')) || 0.000000;
-    let balance = parseFloat(localStorage.getItem('currency2')) || 0.000000;
-    
-    document.getElementById('balance').innerText = formatNumber(balance);
-    document.getElementById('in-storage').innerText = formatNumber(storage, 6);
-    
-    function formatNumber(num, decimals = 6) {
-      return num.toLocaleString('tr-TR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-    }
-    
-    function collectRBT() {
-      if (storage >= MIN_STORAGE_TO_COLLECT) {
-        const collectedAmount = storage;
-        balance += storage;
-        storage = 0;
-        localStorage.setItem('currency2', balance.toFixed(6));
-        localStorage.setItem('storage', storage.toFixed(6));
-        document.getElementById('balance').innerText = formatNumber(balance);
-        document.getElementById('in-storage').innerText = formatNumber(storage, 6);
-        document.getElementById('collect-button').disabled = true;
-        
-        // Popup'u göster
-        showPopup(collectedAmount);
-      }
-    }
-    
-    function showPopup(collectedAmount) {
-      document.getElementById('popup-message').innerText = `Toplamda ${collectedAmount.toFixed(6)} yıldız topladınız!`;
-      document.getElementById('popup').style.display = 'flex';
-    }
+        function updateBalance() {
+            let storedBalance = parseFloat(localStorage.getItem('currency2')) || 0;
+            document.getElementById('balance').innerText = '$' + storedBalance.toFixed(2);
 
-    function closePopup() {
-      document.getElementById('popup').style.display = 'none';
-    }
+            let opeBalance = parseFloat(localStorage.getItem('opeBalance')) || 0;
+            document.getElementById('ope-balance').innerText = opeBalance.toFixed(4) + ' OPE';
+        }
 
-    function addPoint(x, y) {
-      const now = Date.now();
-      if (now - lastClickTime > 1000) {
-        clickCount = 0;
-        lastClickTime = now;
-      }
-    
-      if (clickCount >= MAX_CLICKS_PER_SECOND) {
-        return;
-      }
-    
-      clickCount++;
-      storage += 0.000001;
-      localStorage.setItem('storage', storage.toFixed(6));
-      document.getElementById('in-storage').innerText = formatNumber(storage, 6);
-      if (storage >= MIN_STORAGE_TO_COLLECT) {
-        document.getElementById('collect-button').disabled = false;
-      }
-    
-      const plusOne = document.createElement('div');
-      plusOne.innerText = '+1';
-      plusOne.classList.add('plus-one');
-      document.body.appendChild(plusOne);
+        let mining = false;
+        let opeBalance = parseFloat(localStorage.getItem('opeBalance')) || 0;
+        const ratePerMinute = 0.002;
+        const ratePerSecond = ratePerMinute / 60;
+        let miningInterval;
 
-      plusOne.style.left = `${x}px`;
-      plusOne.style.top = `${y}px`;
+        function startMining(resume = false) {
+            if (!mining) {
+                mining = true;
+                document.querySelector('.start-mining button').innerText = 'Mining is done';
+                if (!resume) {
+                    localStorage.setItem('mining', 'true');
+                }
+                miningInterval = setInterval(() => {
+                    opeBalance += ratePerSecond;
+                    localStorage.setItem('opeBalance', opeBalance.toFixed(4));
+                    document.getElementById('ope-balance').innerText = opeBalance.toFixed(4) + ' OPE';
+                }, 1000);
+            }
+        }
 
-      setTimeout(() => {
-        plusOne.remove();
-      }, 800);
-    }
+        window.addEventListener('beforeunload', () => {
+            if (mining) {
+                localStorage.setItem('mining', 'true');
+            }
+        });
 
-    document.getElementById('add-point-image').addEventListener('click', function (event) {
-      const x = event.clientX;
-      const y = event.clientY;
-      addPoint(x, y);
-    });
+        function calculateTRY() {
+            let opeAmount = parseFloat(document.getElementById('ope-input').value) || 0;
+            let tryAmount = opeAmount * 0.15;
+            document.getElementById('try-output').innerText = 'You will get $' + tryAmount.toFixed(2);
+        }
 
-    // Prevent default drag behavior on images
-    document.querySelectorAll('img').forEach((img) => {
-      img.ondragstart = () => false;
-    });
-</script>
+        function convertToTRY() {
+            let opeAmount = parseFloat(document.getElementById('ope-input').value) || 0;
+            if (opeAmount <= 0 || opeAmount > opeBalance) {
+                alert('Invalid OPE amount.');
+                return;
+            }
 
-</body>
+            let storedBalance = parseFloat(localStorage.getItem('currency2')) || 0;
+            let tryAmount = opeAmount * 0.15;
+
+            storedBalance += tryAmount;
+            opeBalance -= opeAmount;
+
+            localStorage.setItem('currency2', storedBalance.toFixed(2));
+            localStorage.setItem('opeBalance', opeBalance.toFixed(4));
+
+            document.getElementById('ope-balance').innerText = opeBalance.toFixed(4) + ' ope';
+            document.getElementById('balance').innerText = '$' + storedBalance.toFixed(2);
+            document.getElementgetElementById('ope-input').value = '';
+            document.getElementById('try-output').innerText = '';
+            
+            alert('Conversion successful!');
+            }
+            </script>
+            </body>
 </html>
