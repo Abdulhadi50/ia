@@ -3,120 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mining App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1, h2, h3 {
-            color: #333;
-        }
-        #balance, #ope-balance {
-            font-size: 24px;
-            margin: 10px 0;
-        }
-        .conversion-form {
-            margin: 20px 0;
-        }
-        .conversion-details {
-            font-size: 18px;
-        }
-        .start-mining {
-            text-align: center;
-            margin-top: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #5cb85c;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #4cae4c;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="conversion">
-            <div>
-                <h2>الرصيد المخزن</h2>
-                <div class="conversion-details">
-                    <h1 id="balance">₺0.00</h1>
-                </div>
-            </div>
-        </div>
-        <div class="conversion-form">
-            <h2>تحويل OPE إلى USD</h2>
-            <input type="number" id="ope-input" placeholder="أدخل مبلغ OPE" oninput="calculateTRY()">
-            <p id="try-output"></p>
-            <button onclick="convertToTRY()">تحويل</button>
-        </div>
-        <div class="balance">
-            <div>
-                <h2>الرصيد الحالي</h2>
-                <div class="balance-details">
-                    <span id="ope-balance">0.0000 OPE</span>
-                    <span class="rate">0.0020/min.</span>
-                </div>
-            </div>
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPY52M61Hpf80eoOxss7JtLM141kZyDlw_mThdPYGPVaH67O4muCyrEdzC5H_lFzS9mbRW_DACwPgyWmXbeKvdFMWo3PZPs-sr9Azm-7f6ZgMBkUqJDrXWUZNuF8R-NdpgWQ9vVz2pvv8sgomgsffDPXWjPJUuXBUeSWqOAEa84UK8XuP_PpssIQYY0y6_/s1280/1000145892.png" alt="Ope Logo" width="50">
-        </div>
-        <div class="start-mining">
-            <button onclick="startMining()">ابدأ التعدين</button>
-        </div>
-    </div>
+    <title>المتجر</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.x/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.x/firebase-auth.js";
+        import { getFirestore, setDoc, doc, getDoc, addDoc, collection, updateDoc } from "https://www.gstatic.com/firebasejs/9.x/firebase-firestore.js";
 
-    <script>
-        // كود إعداد الـ Worker
-        const worker = new Worker('worker.js');
-
-        // الاستماع للرسائل من الـ Worker
-        worker.onmessage = (event) => {
-            const newOpeBalance = event.data; // الرصيد الجديد
-            document.getElementById('ope-balance').innerText = newOpeBalance + ' OPE';
+        const firebaseConfig = {
+            apiKey: "AIzaSyADJJPRxJhItXVJ2cEsIymB1WuVVDpQlHI",
+            authDomain: "telegram-mini-app-c3189.firebaseapp.com",
+            projectId: "telegram-mini-app-c3189",
+            storageBucket: "telegram-mini-app-c3189.appspot.com",
+            messagingSenderId: "1078003355289",
+            appId: "1:1078003355289:web:99ce2ce7471a6e5595f208"
         };
 
-        document.addEventListener('DOMContentLoaded', (event) => {
-            // تحديث الرصيد عند تحميل الصفحة
-            updateBalance();
-        });
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore();
 
-        function updateBalance() {
-            let storedBalance = parseFloat(localStorage.getItem('currency2')) || 0;
-            document.getElementById('balance').innerText = '$' + storedBalance.toFixed(2);
+        window.signUp = async function(email, password) {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", userCredential.user.uid), { balance: 0 });
+                alert("تم إنشاء الحساب بنجاح");
+            } catch (error) {
+                console.error("خطأ في تسجيل المستخدم:", error.message);
+                alert("خطأ في تسجيل المستخدم: " + error.message);
+            }
+        };
 
-            let opeBalance = parseFloat(localStorage.getItem('opeBalance')) || 0;
-            document.getElementById('ope-balance').innerText = opeBalance.toFixed(4) + ' OPE';
+        window.signIn = async function(email, password) {
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                await getUserBalance(userCredential.user.uid);
+                alert("تم تسجيل الدخول بنجاح");
+            } catch (error) {
+                console.error("خطأ في تسجيل الدخول:", error.message);
+                alert("خطأ في تسجيل الدخول: " + error.message);
+            }
+        };
+
+        async function getUserBalance(userId) {
+            const userDoc = await getDoc(doc(db, "users", userId));
+            if (userDoc.exists()) {
+                const balance = userDoc.data().balance;
+                document.getElementById("balance").textContent = balance + " $";
+                return balance; 
+            } else {
+                console.log("لا يوجد مستند!");
+                return 0; 
+            }
         }
 
-        function calculateTRY() {
-            const opeInput = parseFloat(document.getElementById('ope-input').value) || 0;
-            const exchangeRate = 0.1; // افتراض أن 1 OPE = 0.1 USD
-            const tryOutput = opeInput * exchangeRate;
-            document.getElementById('try-output').innerText = 'قيمة التحويل: $' + tryOutput.toFixed(2);
-        }
+        window.requestBalanceTopUp = async function(amount) {
+            const userId = auth.currentUser?.uid; 
+            if (!userId) {
+                alert("يرجى تسجيل الدخول أولاً");
+                return;
+            }
 
-        function convertToTRY() {
-            alert('تم تحويل OPE إلى TRY بنجاح!');
-        }
+            try {
+                await addDoc(collection(db, "topUpRequests"), {
+                    userId: userId,
+                    amount: parseFloat(amount), // تأكد من تحويل المبلغ إلى عدد
+                    status: "pending"
+                });
 
-        function startMining() {
-            alert('تعدين بدأ!');
-        }
+                const currentBalance = await getUserBalance(userId);
+                const newBalance = currentBalance + parseFloat(amount); 
+                await updateDoc(doc(db, "users", userId), { balance: newBalance });
+
+                alert("تم إرسال طلب تعبئة الرصيد بنجاح وتم تحديث الرصيد!");
+            } catch (error) {
+                console.error("خطأ في إرسال طلب التعبئة:", error.message);
+                alert("خطأ في إرسال طلب التعبئة: " + error.message);
+            }
+        };
     </script>
+</head>
+<body>
+    <h1>مرحبًا بك في المتجر</h1>
+
+    <div>
+        <h2>تسجيل مستخدم جديد</h2>
+        <input type="email" id="signUpEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="signUpPassword" placeholder="كلمة المرور">
+        <button onclick="signUp(document.getElementById('signUpEmail').value, document.getElementById('signUpPassword').value)">تسجيل</button>
+    </div>
+
+    <div>
+        <h2>تسجيل الدخول</h2>
+        <input type="email" id="signInEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="signInPassword" placeholder="كلمة المرور">
+        <button onclick="signIn(document.getElementById('signInEmail').value, document.getElementById('signInPassword').value)">دخول</button>
+    </div>
+
+    <div>
+        <h2>رصيدك الحالي</h2>
+        <p id="balance">0 $</p>
+    </div>
+
+    <div>
+        <h2>طلب تعبئة رصيد</h2>
+        <input type="number" id="topUpAmount" placeholder="المبلغ" min="1">
+        <button onclick="requestBalanceTopUp(document.getElementById('topUpAmount').value)">إرسال الطلب</button>
+    </div>
 </body>
 </html>
